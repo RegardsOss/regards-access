@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
+ * Copyright 2017-2020 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
  *
  * This file is part of REGARDS.
  *
@@ -90,18 +90,6 @@ public class AccessSearchControllerIT extends AbstractRegardsIT {
                 .expectStatusOk().expectToHaveSize(JSON_PATH_ROOT + ".content[0].content.services", 2)
                 .expectValue(JSON_PATH_ROOT + ".content[0].content.services[0].content.label", "conf0")
                 .expectValue(JSON_PATH_ROOT + ".content[0].content.services[1].content.label", "uiPluginConfiguration2")
-                .addParameter("q", BackendForFrontendTestUtils.OPENSEARCH_QUERY), "Error searching datasets");
-    }
-
-    @Test
-    @Requirement("REGARDS_DSL_ACC_USE_700")
-    @Purpose("Check the system can inject applicable services to the result of a search")
-    public void searchDocuments() {
-        performDefaultGet(AccessSearchController.ROOT_PATH + AccessSearchController.DOCUMENTS_SEARCH, customizer()
-                .expectStatusOk().expectToHaveSize(JSON_PATH_ROOT + ".content[0].content.services", 3)
-                .expect(MockMvcResultMatchers.jsonPath(JSON_PATH_ROOT + ".content[0].content.services[*].content.label",
-                                                       Matchers.containsInAnyOrder("conf0", "conf1",
-                                                                                   "uiPluginConfiguration2")))
                 .addParameter("q", BackendForFrontendTestUtils.OPENSEARCH_QUERY), "Error searching datasets");
     }
 

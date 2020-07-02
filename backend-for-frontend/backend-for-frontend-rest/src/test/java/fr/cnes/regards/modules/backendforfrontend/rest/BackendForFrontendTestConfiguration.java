@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
+ * Copyright 2017-2020 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
  *
  * This file is part of REGARDS.
  *
@@ -61,8 +61,6 @@ public class BackendForFrontendTestConfiguration {
                 .thenReturn(BackendForFrontendTestUtils.SEARCH_DATAOBJECTS_RESULT);
         Mockito.when(mock.searchDataobjectsReturnDatasets(Mockito.any()))
                 .thenReturn(BackendForFrontendTestUtils.SEARCH_DATASETS_RESULT);
-        Mockito.when(mock.searchDocuments(Mockito.any()))
-                .thenReturn(BackendForFrontendTestUtils.SEARCH_DOCUMENTS_RESULT);
         return mock;
     }
 }

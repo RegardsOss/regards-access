@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright 2017-2019 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
+ Copyright 2017-2020 CNES - CENTRE NATIONAL d'ETUDES SPATIALES
  
  This file is part of REGARDS.
  
@@ -22,7 +22,7 @@
 
 	<groupId>fr.cnes.regards.modules</groupId>
 	<artifactId>access-services</artifactId>
-	<version>0.4.1</version>
+	<version>1.0.1</version>
 	<packaging>pom</packaging>
 
 	<name>Access Services</name>
@@ -51,7 +51,7 @@
 	<parent>
 		<groupId>fr.cnes.regards</groupId>
 		<artifactId>regards-parent</artifactId>
-		<version>0.4.1</version>
+		<version>1.0.1</version>
 		<relativePath/>
 	</parent>
 

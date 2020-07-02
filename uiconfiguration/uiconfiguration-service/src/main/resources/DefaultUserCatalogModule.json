@@ -1,106 +1,142 @@
 {
   "primaryPane": "ALWAYS_EXPANDED",
+  "facets": {
+    "enabledFor": {
+      "DATA": true,
+      "DATASET": true
+    },
+    "initiallyEnabled": true,
+    "list": []
+  },
+  "restrictions": {
+    "byDataset": {
+      "type": "NONE",
+      "selection": []
+    }
+  },
   "viewsGroups": {
     "DATA": {
-      "enableDownload": true,
-      "tabTitle": {"en":"","fr":""},
-      "initialMode": "TABLE",
-      "sorting": [],
       "enabled": true,
+      "tabTitle": {},
+      "initialMode": "TABLE",
+      "enableDownload": false,
+      "sorting": [
+        {
+          "attributes": [
+            {
+              "name": "label"
+            }
+          ]
+        }
+      ],
       "views": {
         "TABLE": {
+          "enabled": true,
           "attributes": [
-	          {
-	          	"attributes": [
-					{
-						"name": "label"
-					}
-				],
-				"label": {
-					"en": "Label",
-					"fr": "Libellé"
-				}
-	          },
-	          {
-	          	"attributes": [
-					{
-						"name": "id"
-					}
-				],
-				"label": {
-					"en": "Identifier",
-					"fr": "Identifiant"
-				}
-	          },
-	          {
-	          	"attributes": [
-					{
-						"name": "files.THUMBNAIL[0]"
-					}
-				],
-				"label": {
-					"en": "Thumbnail",
-					"fr": "Vignette"
-				}
-	          }
-          ],
-          "enabled": true
+            {
+              "attributes": [
+                {
+                  "name": "files"
+                }
+              ],
+              "label": {
+                "en": "Thumbnail",
+                "fr": "Vignette"
+              }
+            },
+            {
+              "attributes": [
+                {
+                  "name": "label"
+                }
+              ],
+              "label": {
+                "en": "Label",
+                "fr": "Libellé"
+              }
+            },
+            {
+              "attributes": [
+                {
+                  "name": "providerId"
+                }
+              ],
+              "label": {
+                "en": "Provider ID",
+                "fr": "ID fournisseur"
+              }
+            }
+          ]
         },
         "QUICKLOOK": {
-          "attributes": [],
-          "enabled": false
+          "enabled": true,
+          "attributes": [
+            {
+              "attributes": [
+                {
+                  "name": "label"
+                }
+              ],
+              "label": {
+                "en": "Label",
+                "fr": "Libellé"
+              }
+            },
+            {
+              "attributes": [
+                {
+                  "name": "providerId"
+                }
+              ],
+              "label": {
+                "en": "Provider ID",
+                "fr": "ID fournisseur"
+              }
+            }
+          ]
         },
         "MAP": {
+          "enabled": false,
           "attributes": [],
-          "enabled": false
+          "backgroundLayer": {
+            "url": null,
+            "type": "AsynchroneWMS"
+          }
         }
-      },
-      "facets": {
-        "initiallyEnabled": false,
-        "list": [],
-        "enabled": false
       }
     },
     "DATASET": {
+      "enabled": true,
       "tabTitle": {},
-      "initialMode": "LIST",
+      "initialMode": "TABLE",
       "sorting": [],
-      "enabled": false,
       "views": {
         "TABLE": {
-          "attributes": [],
-          "enabled": false
-        },
-        "QUICKLOOK": {
-          "attributes": [],
-          "enabled": false
-        },
-        "MAP": {
-          "attributes": [],
-          "enabled": false
-        }
-      }
-    },
-    "DOCUMENT": {
-      "tabTitle": {
-        "en": "",
-        "fr": ""
-      },
-      "initialMode": "LIST",
-      "sorting": [],
-      "enabled": false,
-      "views": {
-        "TABLE": {
-          "attributes": [],
-          "enabled": false
-        },
-        "QUICKLOOK": {
-          "attributes": [],
-          "enabled": false
-        },
-        "MAP": {
-          "attributes": [],
-          "enabled": false
+          "enabled": true,
+          "attributes": [
+            {
+              "attributes": [
+                {
+                  "name": "label"
+                }
+              ],
+              "label": {
+                "en": "Label",
+                "fr": "Libellé"
+              }
+            },
+            {
+              "attributes": [
+                {
+                  "name": "providerId"
+                }
+              ],
+              "label": {
+                "en": "Provider ID",
+                "fr": "ID fournisseur"
+              }
+            }
+          ]
         }
       }
     }

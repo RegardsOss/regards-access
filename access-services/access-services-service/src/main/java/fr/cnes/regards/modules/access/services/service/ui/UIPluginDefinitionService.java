@@ -18,9 +18,10 @@
  */
 package fr.cnes.regards.modules.access.services.service.ui;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.cnes.regards.framework.amqp.IPublisher;
 import fr.cnes.regards.framework.jpa.multitenant.event.spring.TenantConnectionReady;
 import fr.cnes.regards.framework.module.rest.exception.EntityInvalidException;
 import fr.cnes.regards.framework.module.rest.exception.EntityNotEmptyException;
@@ -44,6 +46,8 @@ import fr.cnes.regards.framework.multitenant.IRuntimeTenantResolver;
 import fr.cnes.regards.framework.multitenant.ITenantResolver;
 import fr.cnes.regards.modules.access.services.dao.ui.IUIPluginConfigurationRepository;
 import fr.cnes.regards.modules.access.services.dao.ui.IUIPluginDefinitionRepository;
+import fr.cnes.regards.modules.access.services.domain.event.EventType;
+import fr.cnes.regards.modules.access.services.domain.event.UIPluginDefinitionEvent;
 import fr.cnes.regards.modules.access.services.domain.ui.UIPluginDefinition;
 import fr.cnes.regards.modules.access.services.domain.ui.UIPluginTypesEnum;
 
@@ -56,6 +60,22 @@ public class UIPluginDefinitionService
      */
     private static final Logger LOG = LoggerFactory.getLogger(UIPluginDefinitionService.class);
 
+    private static final String DEFAULT_STRING_CRITERION_NAME = "string-criteria";
+
+    private static final String DEFAULT_FULLTEXT_CRITERION_NAME = "full-text-criteria";
+
+    private static final String DEFAULT_NUMERICAL_CRITERION_NAME = "numerical-criteria";
+
+    private static final String DEFAULT_TWONUMERICAL_CRITERION_NAME = "two-numerical-criteria";
+
+    private static final String DEFAULT_TEMPORAL_CRITERION_NAME = "temporal-criteria";
+
+    private static final String DEFAULT_TWOTEMPORAL_CRITERION_NAME = "two-temporal-criteria";
+
+    private static final String DEFAULT_ENUMERATED_CRITERION_NAME = "enumerated-criteria";
+
+    private static final String DEFAULT_DATAWITHONLYPIC_CRITERION_NAME = "data-with-picture-only";
+
     @Autowired
     private IUIPluginDefinitionRepository repository;
 
@@ -64,6 +84,9 @@ public class UIPluginDefinitionService
 
     @Value("${regards.access.multitenant:true}")
     private boolean isMultitenentMicroservice;
+
+    @Autowired
+    private IPublisher publisher;
 
     /**
      * Runtime tenant resolver
@@ -118,50 +141,62 @@ public class UIPluginDefinitionService
     protected void initDefault() {
         // Create default plugins if no plugin defined
         final List<UIPluginDefinition> plugins = repository.findAll();
-        if (plugins.isEmpty()) {
-            // Create string plugin
-            UIPluginDefinition plugin = new UIPluginDefinition();
-            plugin.setName("string-criteria");
-            plugin.setSourcePath("/plugins/criterion/string/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
-            repository.save(plugin);
-
-            plugin = new UIPluginDefinition();
-            plugin.setName("full-text-criteria");
-            plugin.setSourcePath("/plugins/criterion/full-text/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
-            repository.save(plugin);
-
-            plugin = new UIPluginDefinition();
-            plugin.setName("numerical-criteria");
-            plugin.setSourcePath("/plugins/criterion/numerical/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
-            repository.save(plugin);
-
-            plugin = new UIPluginDefinition();
-            plugin.setName("two-numerical-criteria");
-            plugin.setSourcePath("/plugins/criterion/two-numerical/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
-            repository.save(plugin);
-
-            plugin = new UIPluginDefinition();
-            plugin.setName("temporal-criteria");
-            plugin.setSourcePath("/plugins/criterion/temporal/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
-            repository.save(plugin);
-
-            plugin = new UIPluginDefinition();
-            plugin.setName("two-temporal-criteria");
-            plugin.setSourcePath("/plugins/criterion/two-temporal/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
-            repository.save(plugin);
-
-            plugin = new UIPluginDefinition();
-            plugin.setName("enumerated-criteria");
-            plugin.setSourcePath("/plugins/criterion/enumerated/plugin.js");
-            plugin.setType(UIPluginTypesEnum.CRITERIA);
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_STRING_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_STRING_CRITERION_NAME,
+                                                                 "/plugins/criterion/string/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
             repository.save(plugin);
         }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_FULLTEXT_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_FULLTEXT_CRITERION_NAME,
+                                                                 "/plugins/criterion/full-text/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_NUMERICAL_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_NUMERICAL_CRITERION_NAME,
+                                                                 "/plugins/criterion/numerical/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_TWONUMERICAL_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_TWONUMERICAL_CRITERION_NAME,
+                                                                 "/plugins/criterion/two-numerical/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_TEMPORAL_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_TEMPORAL_CRITERION_NAME,
+                                                                 "/plugins/criterion/temporal/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_TWOTEMPORAL_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_TWOTEMPORAL_CRITERION_NAME,
+                                                                 "/plugins/criterion/two-temporal/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_ENUMERATED_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_ENUMERATED_CRITERION_NAME,
+                                                                 "/plugins/criterion/enumerated/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
+        if (!plugins.stream().anyMatch(p -> p.getName().equals(DEFAULT_DATAWITHONLYPIC_CRITERION_NAME))) {
+            UIPluginDefinition plugin = UIPluginDefinition.build(DEFAULT_DATAWITHONLYPIC_CRITERION_NAME,
+                                                                 "/plugins/criterion/data-with-picture-only/plugin.js",
+                                                                 UIPluginTypesEnum.CRITERIA);
+            repository.save(plugin);
+        }
+
     }
 
     @Override
@@ -184,7 +219,9 @@ public class UIPluginDefinitionService
 
     @Override
     public UIPluginDefinition savePlugin(final UIPluginDefinition pPlugin) throws EntityInvalidException {
-        return repository.save(pPlugin);
+        UIPluginDefinition pluginDef = repository.save(pPlugin);
+        publisher.publish(UIPluginDefinitionEvent.build(pluginDef, EventType.CREATE));
+        return pluginDef;
     }
 
     @Override
@@ -193,7 +230,9 @@ public class UIPluginDefinitionService
         if (!repository.existsById(pPlugin.getId())) {
             throw new EntityNotFoundException(pPlugin.getId(), UIPluginDefinition.class);
         }
-        return repository.save(pPlugin);
+        UIPluginDefinition pluginDef = repository.save(pPlugin);
+        publisher.publish(UIPluginDefinitionEvent.build(pluginDef, EventType.UPDATE));
+        return pluginDef;
     }
 
     @Override
@@ -206,7 +245,13 @@ public class UIPluginDefinitionService
         if (pluginConfigurationRepository.hasPluginConfigurations(oPluginDef.get())) {
             throw new EntityNotEmptyException(pluginId, UIPluginDefinition.class);
         }
+        publisher.publish(UIPluginDefinitionEvent.build(oPluginDef.get(), EventType.DELETE));
         repository.deleteById(pluginId);
+    }
+
+    @Override
+    public Optional<UIPluginDefinition> retrievePlugin(String name) {
+        return this.repository.findOneByName(name);
     }
 
 }

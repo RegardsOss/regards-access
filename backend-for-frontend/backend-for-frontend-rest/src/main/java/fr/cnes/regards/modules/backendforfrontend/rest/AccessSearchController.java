@@ -18,6 +18,7 @@
  */
 package fr.cnes.regards.modules.backendforfrontend.rest;
 
+import com.google.gson.JsonParser;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -26,7 +27,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
@@ -40,13 +41,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import fr.cnes.regards.framework.oais.urn.EntityType;
-import fr.cnes.regards.framework.oais.urn.UniformResourceName;
 import fr.cnes.regards.framework.security.annotation.ResourceAccess;
 import fr.cnes.regards.framework.security.role.DefaultRole;
+import fr.cnes.regards.framework.urn.EntityType;
+import fr.cnes.regards.framework.urn.UniformResourceName;
 import fr.cnes.regards.modules.access.services.client.IServiceAggregatorClient;
 import fr.cnes.regards.modules.access.services.domain.aggregator.PluginServiceDto;
 import fr.cnes.regards.modules.search.client.ILegacySearchEngineJsonClient;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 /**
  * Controller proxying rs-catalog's CatalogController in order to inject services.
@@ -105,9 +108,15 @@ public class AccessSearchController {
         // before everything, we need to encode '+' and only '+' which is interpreted as ' ' by jetty
         // and which is not encoded by feign which is respecting RFC1738 on URI
         encodePlus(allParams);
-        JsonObject entities = searchClient.searchAll(allParams).getBody();
-        injectApplicableServices(entities);
-        return new ResponseEntity<>(entities, HttpStatus.OK);
+        try {
+            JsonObject entities = searchClient.searchAll(allParams).getBody();
+            injectApplicableServices(entities);
+            return new ResponseEntity<>(entities, HttpStatus.OK);
+        } catch (HttpServerErrorException exception) {
+            JsonObject jsonObject = new JsonParser().parse(exception.getResponseBodyAsString()).getAsJsonObject();
+            HttpStatus statusCode = exception.getStatusCode();
+            return new ResponseEntity<>(jsonObject, statusCode);
+        }
     }
 
     /**
@@ -126,9 +135,15 @@ public class AccessSearchController {
         // before everything, we need to encode '+' and only '+' which is interpreted as ' ' by jetty
         // and which is not encoded by feign which is respecting RFC1738 on URI
         encodePlus(allParams);
-        JsonObject entities = searchClient.searchCollections(allParams).getBody();
-        injectApplicableServices(entities);
-        return new ResponseEntity<>(entities, HttpStatus.OK);
+        try {
+            JsonObject entities = searchClient.searchCollections(allParams).getBody();
+            injectApplicableServices(entities);
+            return new ResponseEntity<>(entities, HttpStatus.OK);
+        } catch (HttpServerErrorException exception) {
+            JsonObject jsonObject = new JsonParser().parse(exception.getResponseBodyAsString()).getAsJsonObject();
+            HttpStatus statusCode = exception.getStatusCode();
+            return new ResponseEntity<>(jsonObject, statusCode);
+        }
     }
 
     /**
@@ -147,9 +162,15 @@ public class AccessSearchController {
         // before everything, we need to encode '+' and only '+' which is interpreted as ' ' by jetty
         // and which is not encoded by feign which is respecting RFC1738 on URI
         encodePlus(allParams);
-        JsonObject entities = searchClient.searchDatasets(allParams).getBody();
-        injectApplicableServices(entities);
-        return new ResponseEntity<>(entities, HttpStatus.OK);
+        try {
+            JsonObject entities = searchClient.searchDatasets(allParams).getBody();
+            injectApplicableServices(entities);
+            return new ResponseEntity<>(entities, HttpStatus.OK);
+        } catch (HttpServerErrorException exception) {
+            JsonObject jsonObject = new JsonParser().parse(exception.getResponseBodyAsString()).getAsJsonObject();
+            HttpStatus statusCode = exception.getStatusCode();
+            return new ResponseEntity<>(jsonObject, statusCode);
+        }
     }
 
     /**
@@ -166,13 +187,19 @@ public class AccessSearchController {
         // before everything, we need to encode '+' and only '+' which is interpreted as ' ' by jetty
         // and which is not encoded by feign which is respecting RFC1738 on URI
         encodePlus(allParams);
-        JsonObject entities = searchClient.searchDataObjects(allParams).getBody();
-        injectApplicableServices(entities);
-        return new ResponseEntity<>(entities, HttpStatus.OK);
+        try {
+            JsonObject entities = searchClient.searchDataObjects(allParams).getBody();
+            injectApplicableServices(entities);
+            return new ResponseEntity<>(entities, HttpStatus.OK);
+        } catch (HttpServerErrorException exception) {
+            JsonObject jsonObject = new JsonParser().parse(exception.getResponseBodyAsString()).getAsJsonObject();
+            HttpStatus statusCode = exception.getStatusCode();
+            return new ResponseEntity<>(jsonObject, statusCode);
+        }
     }
 
     private void encodePlus(MultiValueMap<String, String> allParams) {
-        allParams.forEach((param,values)->values.replaceAll(value->value.replaceAll("\\+", "%2B")));
+        allParams.forEach((param, values) -> values.replaceAll(value -> value.replaceAll("\\+", "%2B")));
     }
 
     /**
@@ -193,9 +220,15 @@ public class AccessSearchController {
         // before everything, we need to encode '+' and only '+' which is interpreted as ' ' by jetty
         // and which is not encoded by feign which is respecting RFC1738 on URI
         encodePlus(allParams);
-        JsonObject entities = searchClient.searchDataobjectsReturnDatasets(allParams).getBody();
-        injectApplicableServices(entities);
-        return new ResponseEntity<>(entities, HttpStatus.OK);
+        try {
+            JsonObject entities = searchClient.searchDataobjectsReturnDatasets(allParams).getBody();
+            injectApplicableServices(entities);
+            return new ResponseEntity<>(entities, HttpStatus.OK);
+        } catch (HttpServerErrorException exception) {
+            JsonObject jsonObject = new JsonParser().parse(exception.getResponseBodyAsString()).getAsJsonObject();
+            HttpStatus statusCode = exception.getStatusCode();
+            return new ResponseEntity<>(jsonObject, statusCode);
+        }
     }
 
     /**
@@ -221,7 +254,7 @@ public class AccessSearchController {
      */
     private JsonElement entityToApplicableServices(JsonObject pEntity) {
         // @formatter:off
-        List<Resource<PluginServiceDto>> applicableServices = JSON_ARRAY_TO_STREAM.apply(pEntity.get("tags").getAsJsonArray()) // Retrieve tags list and convert it to stream
+        List<EntityModel<PluginServiceDto>> applicableServices = JSON_ARRAY_TO_STREAM.apply(pEntity.get("tags").getAsJsonArray()) // Retrieve tags list and convert it to stream
             .filter(jsonElement -> !jsonElement.isJsonNull())
             .map(JsonElement::getAsString) // Convert elements of the stream to strings
             .filter(UniformResourceName::isValidUrn) // Only keep URNs

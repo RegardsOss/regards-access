@@ -23,7 +23,6 @@
 
 	<groupId>fr.cnes.regards.microservices.access</groupId>
 	<artifactId>bootstrap-access-instance</artifactId>
-	<version>1.2.1</version>
 	<name>Bootstrap Access Instance</name>
 	<description>Boots the Access microservice with cross-tenant features</description>
 	<url>https://github.com/RegardsOss/RegardsOss.github.io</url>
@@ -51,13 +50,14 @@
 	<parent>
 		<groupId>fr.cnes.regards</groupId>
 		<artifactId>regards-boot-parent</artifactId>
-		<version>1.2.1</version>
+		<version>1.4.0</version>
 		<relativePath></relativePath>
 	</parent>
 
 	<properties>
 		<microservice.heap.size>512m</microservice.heap.size>
 		<fr.cnes.regards.docker.image.name>rs-access-instance</fr.cnes.regards.docker.image.name>
+		<docker.guest.port>9040</docker.guest.port>
 	</properties>
 
 	<dependencies>
